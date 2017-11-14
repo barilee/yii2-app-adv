@@ -1,7 +1,7 @@
 {
     "name": "barilee/yii2-app-adv",
     "description": "Yii 2 Application (Advanced)",
-    "keywords": ["yii2", "framework", "advanced", "project template"],
+    "keywords": ["yii2", "framework", "advanced", "project template", "base project"],
     "homepage": "http://www.lineisle.com/yii2-app-adv",
     "type": "project",
     "license": "BSD-3-Clause",
