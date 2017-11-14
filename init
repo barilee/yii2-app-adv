@@ -72,11 +72,12 @@ if (isset($env['skipFiles'])) {
 }
 $all = false;
 foreach ($files as $file) {
-    if (!copyFile($root, "environments/{$env['path']}/$file", $file, $all, $params)) {
+    $target = getFileIntended($file);
+    if (!copyFile($root, "environments/{$env['path']}/$file", $target, $all, $params)) {
         break;
     }
+    replaceContent($target);
 }
-
 $callbacks = ['setCookieValidationKey', 'setWritable', 'setExecutable', 'createSymlink'];
 foreach ($callbacks as $callback) {
     if (!empty($env[$callback])) {
@@ -86,6 +87,26 @@ foreach ($callbacks as $callback) {
 
 echo "\n  ... initialization completed.\n\n";
 
+function getFileIntended($file){
+    global $env;
+    $rPath = isset($env['replacePath']) ? $env['replacePath'] : [];
+    foreach ($rPath as $key => $value) {
+        if(strpos($file, $key) !== false){
+            $file = str_replace($key, $value, $file);
+        }
+    }
+    return $file;
+}
+function replaceContent($file){
+    global $env;
+    $rText = isset($env['replaceText']) ? $env['replaceText'] : [];
+    foreach ($rText as $key => $array) {
+        $filename = getFileIntended($key);
+        if (strpos($file, $filename) !== false && file_exists($file)) {
+            file_put_contents($file, str_replace(array_keys($array), array_values($array), file_get_contents($file)));
+        }
+    }
+}
 function getFileList($root, $basePath = '')
 {
     $files = [];
@@ -173,6 +194,7 @@ function getParams()
 function setWritable($root, $paths)
 {
     foreach ($paths as $writable) {
+        $writable = getFileIntended($writable);
         if (is_dir("$root/$writable")) {
             if (@chmod("$root/$writable", 0777)) {
                 echo "      chmod 0777 $writable\n";
@@ -188,6 +210,7 @@ function setWritable($root, $paths)
 function setExecutable($root, $paths)
 {
     foreach ($paths as $executable) {
+        $executable = getFileIntended($executable);
         if (file_exists("$root/$executable")) {
             if (@chmod("$root/$executable", 0755)) {
                 echo "      chmod 0755 $executable\n";
@@ -203,6 +226,7 @@ function setExecutable($root, $paths)
 function setCookieValidationKey($root, $paths)
 {
     foreach ($paths as $file) {
+        $file = getFileIntended($file);
         echo "   generate cookie validation key in $file\n";
         $file = $root . '/' . $file;
         $length = 32;
@@ -216,6 +240,7 @@ function setCookieValidationKey($root, $paths)
 function createSymlink($root, $links)
 {
     foreach ($links as $link => $target) {
+        $target = getFileIntended($target);
         //first removing folders to avoid errors if the folder already exists
         @rmdir($root . "/" . $link);
         //next removing existing symlink in order to update the target
