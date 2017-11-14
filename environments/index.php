@@ -31,6 +31,20 @@
 return [
     'Development' => [
         'path' => 'dev',
+        'replacePath' => [ // will set for target in createSymlink
+            'backend/web' => '../public_html/bii',
+            'frontend/web' => '../public_html',
+        ],
+        'replaceText' => [
+            'frontend/web/index.php' => [
+                '/../../' => '/../yii2-app-adv/',
+                '/../config/' => '/../yii2-app-adv/frontend/config/',
+            ],
+            'backend/web/index.php' => [
+                '/../../' => '/../../yii2-app-adv/',
+                '/../config/' => '/../../yii2-app-adv/backend/config/',
+            ],
+        ],
         'setWritable' => [
             'backend/runtime',
             'backend/web/assets',
@@ -48,6 +62,20 @@ return [
     ],
     'Production' => [
         'path' => 'prod',
+        'replacePath' => [ // will set for target in createSymlink
+            'backend/web' => '../public_html/bii',
+            'frontend/web' => '../public_html',
+        ],
+        'replaceText' => [
+            'frontend/web/index.php' => [
+                '/../../' => '/../yii2-app-adv/',
+                '/../config/' => '/../yii2-app-adv/frontend/config/',
+            ],
+            'backend/web/index.php' => [
+                '/../../' => '/../../yii2-app-adv/',
+                '/../config/' => '/../../yii2-app-adv/backend/config/',
+            ],
+        ],
         'setWritable' => [
             'backend/runtime',
             'backend/web/assets',
